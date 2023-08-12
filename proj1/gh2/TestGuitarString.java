@@ -43,6 +43,7 @@ public class TestGuitarString  {
         assertEquals(0.0, s.sample(), 0.0);
         assertEquals(0.0, s.sample(), 0.0);
         assertEquals(0.0, s.sample(), 0.0);
+        System.out.println(s.sample());
         s.pluck();
         double sample1 = s.sample();
         assertNotEquals("After plucking, your samples should not be 0.", 0.0, sample1);
