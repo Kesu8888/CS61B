@@ -23,13 +23,13 @@ public class ULLMap<K, V>  implements Map61B<K, V> {
         return lookup.val;
     }
 
-    @Override
+
     public int size() {
         return size;
     }
 
     /** Removes all of the mappings from this map. */
-    @Override
+
     public void clear() {
         size = 0;
         list = null;
@@ -60,7 +60,7 @@ public class ULLMap<K, V>  implements Map61B<K, V> {
         return list.get(key) != null;
     }
 
-    @Override
+
     public Iterator<K> iterator() {
         return new ULLMapIter();
     }
@@ -111,12 +111,12 @@ public class ULLMap<K, V>  implements Map61B<K, V> {
             cur = list;
         }
 
-        @Override
+
         public boolean hasNext() {
             return cur != null;
         }
 
-        @Override
+
         public K next() {
             K ret = cur.key;
             cur = cur.next;
@@ -128,17 +128,17 @@ public class ULLMap<K, V>  implements Map61B<K, V> {
 
     }
 
-    @Override
+
     public V remove(K key) {
         throw new UnsupportedOperationException();
     }
 
-    @Override
+
     public V remove(K key, V value) {
         throw new UnsupportedOperationException();
     }
 
-    @Override
+
     public Set<K> keySet() {
         throw new UnsupportedOperationException();
     }
