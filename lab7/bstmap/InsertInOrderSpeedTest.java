@@ -138,4 +138,8 @@ public class InsertInOrderSpeedTest {
                 + N + " strings.");
     }
 
+    public static void printInOrder() {
+
+    }
+
 }
