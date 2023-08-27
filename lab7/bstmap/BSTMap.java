@@ -1,5 +1,7 @@
 package bstmap;
 
+import edu.princeton.cs.algs4.BST;
+
 import java.util.Iterator;
 import java.util.Set;
 
@@ -9,11 +11,6 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V>{
 
     public BSTMap() {
         Size = 0;
-    }
-
-    public BSTMap(K key, V value) {
-        Root = new BSTNode<>(key, value);
-        Size = 1;
     }
 
     //
@@ -83,6 +80,13 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V>{
         return removeValue;
     }
 
+    public void printInOrder() {
+        if (Size == 0) {
+            return;
+        }
+        printNode(Root);
+        return;
+    }
     public V remove(K key, V value) {
         throw new UnsupportedOperationException();
     }
@@ -96,6 +100,14 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V>{
 
 
     /* Helper methods for "put", "containsKey", "remove" and "get"  */
+
+    private void printNode(BSTNode<K, V> Node) {
+        if (Node != null) {
+            System.out.println(Node.key);
+            printNode(Node.left);
+            printNode(Node.right);
+        }
+    }
     private void keyInsert(K key, V value, BSTNode<K, V> BSTTree) {
         if (key.compareTo(BSTTree.key) == 0) {
             System.out.println("The key "+ key + " is already exist in the map.");
