@@ -1,5 +1,4 @@
 package deque;
-import net.sf.saxon.functions.Minimax;
 
 import java.util.Comparator;
 import java.util.Iterator;

@@ -1,66 +1,46 @@
 package deque;
-import java.lang.Iterable;
+import java.lang.*;
 import java.util.Iterator;
 
-public class LinkedListDeque<T> implements Deque<T>, Iterable<T>{
+public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
     private int size;
-    private final ListNode<T> FrontSentinel;
-    private final ListNode<T> BackSentinel;
-    private ListNode<T> recursion;
+    private final ListNode<T> Sentinel;
+
     public LinkedListDeque() {
-        FrontSentinel = new ListNode<>(null, null, null);
-        BackSentinel = new ListNode<>(null, null, null);
+        size = 0;
+        Sentinel = new ListNode<T>(null, null, null);
+        Sentinel.prev = Sentinel;
+        Sentinel.next = Sentinel;
     }
 
     public T getFirst() {
-        ListNode<T> getFirst= FrontSentinel.next;
-        return getFirst.item;
+        ListNode<T> first = Sentinel.next;
+        return first.item;
     }
 
     public T getLast() {
-        ListNode<T> getLast= BackSentinel.prev;
-        return getLast.item;
+        ListNode<T> last = Sentinel.prev;
+        return last.item;
     }
 
     public void addFirst(T item) {
-        size += 1;
-        ListNode<T> New;
-        if (BackSentinel.prev != null) {
-            New = new ListNode<T>(FrontSentinel, item, FrontSentinel.next);
-        } else {
-            New = new ListNode<T>(FrontSentinel, item, BackSentinel);
-            BackSentinel.prev = New;
-        }
-        ListNode<T> p;
-        if (FrontSentinel.next != null) {
-            p = FrontSentinel.next;
-            p.prev = New;
-        }
-        FrontSentinel.next = New;
+        size++;
+        ListNode<T> oldFront = Sentinel.next;
+        ListNode<T> newFront = new ListNode<T>(Sentinel, item, oldFront);
+        oldFront.prev = newFront;
+        Sentinel.next = newFront;
     }
 
     public void addLast(T item) {
-        size += 1;
-        ListNode<T> New;
-        if (FrontSentinel.next != null) {
-            New = new ListNode<T>(BackSentinel.prev, item, BackSentinel);
-        } else {
-            New = new ListNode<T>(FrontSentinel, item, BackSentinel);
-            FrontSentinel.next = New;
-        }
-        ListNode<T> p;
-        if (BackSentinel.prev != null) {
-            p = BackSentinel.prev;
-            p.next = New;
-        }
-        BackSentinel.prev = New;
+        size++;
+        ListNode<T> oldBack = Sentinel.prev;
+        ListNode<T> newBack = new ListNode<T>(oldBack, item, Sentinel);
+        oldBack.next = newBack;
+        Sentinel.prev = newBack;
     }
 
     public boolean isEmpty() {
-        if (size == 0) {
-            return true;
-        }
-        return false;
+        return size == 0;
     }
 
     public int size() {
@@ -68,142 +48,122 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T>{
     }
 
     public void printDeque() {
-        for (Iterator<T> i=iterator(); i.hasNext();){
+        for (Iterator<T> i = iterator(); i.hasNext(); ) {
             System.out.print(i.next() + " ");
-        } ;
+        }
+        ;
         System.out.println();
     }
 
     public T removeFirst() {
-        if (FrontSentinel.next == null) {
+        if (size == 0) {
             return null;
         }
-        size = size - 1;
-        ListNode<T> Current= FrontSentinel.next;
-        T i= Current.item;
-        if (Current.next== BackSentinel) {
-            FrontSentinel.next= null;
-            BackSentinel.prev= null;
-        }
-        else {
-            ListNode<T> Next=Current.next;
-            FrontSentinel.next= Next;
-            Next.prev= FrontSentinel;
-        }
-        return i;
+        ListNode<T> oldFront = Sentinel.next;
+        ListNode<T> newFront = oldFront.next;
+        T removed = oldFront.item;
+        Sentinel.next = newFront;
+        newFront.prev = Sentinel;
+        size--;
+        return removed;
     }
 
     public T removeLast() {
-        // if the last item is null, returns null
-        if (BackSentinel.prev == null) {
+        if (size == 0) {
             return null;
         }
-        size = size - 1;
-        ListNode<T> Current= BackSentinel.prev;
-        T i= Current.item;
-        //If there is no item after last item, turn both Front and back Sentinel to null
-        if (Current.prev== FrontSentinel) {
-            FrontSentinel.next= null;
-            BackSentinel.prev= null;
-        }
-        //There is a ListNode after last ListNode
-        else {
-            ListNode<T> Prev=Current.prev;
-            BackSentinel.prev= Prev;
-            Prev.next= BackSentinel;
-        }
-        return i;
+        ListNode<T> oldBack = Sentinel.prev;
+        ListNode<T> newBack = oldBack.prev;
+        T removed = oldBack.item;
+        Sentinel.prev = newBack;
+        newBack.next = Sentinel;
+        size--;
+        return removed;
     }
 
     public T get(int index) {
-        if ((index < 0) | (index > size)) {
-            throw new UnsupportedOperationException("The index you have input is not existed");
-        }
-        int Serial;
-        ListNode<T> current = null;
-        if (index < ((double) size/(double) 2)) {
-            Serial= index;
-            for (int i= 0; i<= Serial; i++) {
-                if (i == 0) {
-                    current = FrontSentinel.next;
-                }
-                else {
-                    current = current.next;
-                }
-            }
-        }
-        else {
-            Serial = size - index;
-                for (int i=0; i< Serial; i++) {
-                    if (i == 0) {
-                        current = BackSentinel.prev;
-                    }
-                    else {
-                    current = current.prev;
-                    }
-            }
-        }
-       return current.item;
-    }
-
-    public Iterator<T> iterator() {
-        return new Iterator<T>() {
-            ListNode<T> current= FrontSentinel;
-
-            @Override
-            public boolean hasNext() {
-                return current.next != BackSentinel;
-            }
-
-            @Override
-            public T next() {
-                if (hasNext()) {
-                    current=current.next;
-                    return current.item;
-                }
+        if (index > size) {
             return null;
-            }
-
-            @Override
-            public void remove() {
-                if (current == FrontSentinel.next){
-                    removeFirst();
-                    current = FrontSentinel;
-                }
-                throw new UnsupportedOperationException();
-            }
-        };
-    }
-
-    public T getRecursion(int index){
-        if (recursion == null) {
-            recursion = FrontSentinel.next;
         }
-        if (index == 1) {
-            return recursion.item;
+        ListNode<T> getIndex = Sentinel;
+        if (index < (size % 2)) {
+            for (int i = 0; i <= index; i++) {
+                getIndex = getIndex.next;
+            }
+            return getIndex.item;
         }
         else {
-            recursion = recursion.next;
-            return getRecursion(index - 1);
+            for (int i = 0; i <= (size - index); i++) {
+                getIndex = getIndex.prev;
+            }
+            return getIndex.item;
         }
     }
 
-    public boolean equals(Object o) {
-        if (o instanceof LinkedListDeque){
-            LinkedListDeque<?> ComDeque= (LinkedListDeque<?>) o;
-            if (size == ComDeque.size()){
-                for (int i =0; i<size; i++){
-                    if (get(i) != ComDeque.get(i)){
-                        return false;
-                    }
+        public Iterator<T> iterator () {
+            return new Iterator<T>() {
+                ListNode<T> current = Sentinel;
+
+                @Override
+                public boolean hasNext() {
+                    return current.next != Sentinel;
                 }
-                return true;
+
+                @Override
+                public T next() {
+                    if (hasNext()) {
+                        current = current.next;
+                        return current.item;
+                    }
+                    return null;
+                }
+
+                @Override
+                public void remove() {
+                    ListNode<T> prevNode = current.prev;
+                    ListNode<T> nextNode = current.next;
+                    prevNode.next = nextNode;
+                    nextNode.prev = prevNode;
+                    size--;
+                }
+            };
+        }
+
+        public T getRecursion ( int index){
+            if (index >= size) {
+                return null;
+            }
+            return RecursionHelper(Sentinel.next, index);
+        }
+
+        private T RecursionHelper (ListNode < T > Node,int index){
+            if (index == 0) {
+                return Node.item;
+            }
+            return RecursionHelper(Node.next, index - 1);
+        }
+
+        public boolean equals (Object o){
+            if (o instanceof LinkedListDeque) {
+                LinkedListDeque<?> comDeque = (LinkedListDeque<?>) o;
+                if (comDeque.size == this.size) {
+                    return allItems() == comDeque.allItems();
+                }
+                return false;
             }
             return false;
         }
-        return false;
+
+        public T[] allItems() {
+        T[] items = (T[]) new Object[size];
+        ListNode<T> Node = Sentinel;
+        for (int i = 0; i< size; i++) {
+            Node = Node.next;
+            items[i] = Node.item;
+        }
+        return items;
+        }
     }
-}
 
 
 
