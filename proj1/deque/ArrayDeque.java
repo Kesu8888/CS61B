@@ -3,11 +3,11 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 
-public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
-    protected int size;
-    protected T[] items;
-    protected int first;
-    protected int last;
+public class ArrayDeque<T> implements Deque<T>{
+    private int size;
+    private T[] items;
+    private int first;
+    private int last;
     private final int factor;
 
     public ArrayDeque() {
@@ -18,7 +18,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         factor = 2;
     }
 
-    public void dequeClear() {
+    private void dequeClear() {
         items = (T[]) new Object[8];
         size = 0;
         first = 0;
@@ -191,14 +191,6 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             return false;
         }
         return false;
-    }
-
-    public String toString(){
-        return Arrays.toString(items);
-    }
-
-    public int TakeFirst(){
-        return first;
     }
 }
 
