@@ -1,7 +1,6 @@
 package deque;
 import java.lang.*;
 import java.util.Iterator;
-import deque.Deque;
 
 public class LinkedListDeque<T> implements Deque<T>{
     private int size;
