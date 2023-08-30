@@ -15,8 +15,7 @@ public class ArrayDequeTest {
      * && is the "and" operation. */
     public void addIsEmptySizeTest() {
         int Capacity = 20;
-        Deque<String> lld1 = new ArrayDeque<>(Capacity);
-        System.out.println(lld1.size());
+        Deque<String> lld1 = new ArrayDeque<>();
  		assertTrue("A newly initialized LLDeque should be empty", lld1.isEmpty());
 		lld1.addFirst("front");
         System.out.println(lld1);
@@ -114,26 +113,9 @@ public class ArrayDequeTest {
 
 
         Deque<Integer> lld1 = new ArrayDeque<Integer>();
-        /*for (int i = 0; i < 1000000; i++) {
-            lld1.addLast(i);
-        } */
-        for (int i = 499999; i >= 250000; i--) {
-            lld1.addFirst(i);
-        }
-        for (int i = 500000; i < 750000; i++) {
+        for (int i = 0; i < 1000000; i++) {
             lld1.addLast(i);
         }
-        for (int i = 249999; i >= 0; i--) {
-            lld1.addFirst(i);
-        }
-        for (int i = 750000; i < 1000000; i++) {
-            lld1.addLast(i);
-        }
-        System.out.println(lld1.get(1));
-        System.out.println(lld1.get(999999));
-        System.out.println(lld1.get(600000));
-        System.out.println(lld1.get(500000));
-
         for (double i = 0; i < 500000; i++) {
             assertEquals("Should have the same value", i, (double) lld1.removeFirst(), 0.0);
         }

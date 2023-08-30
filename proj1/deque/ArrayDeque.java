@@ -1,57 +1,92 @@
 package deque;
-import java.lang.*;
 import java.util.Arrays;
 import java.util.Iterator;
 
 
 public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
-    protected int size = 0;
-    public T[] items;
-    protected int first = 0;
-    protected int bounds;
-    protected int last = 0;
+    protected int size;
+    protected T[] items;
+    protected int first;
+    protected int last;
+    private final int factor;
 
     public ArrayDeque() {
-        bounds = 8;
-        items = (T[]) new Object[bounds];
+        items = (T[]) new Object[8];
+        size = 0;
+        first = 0;
+        last = 0;
+        factor = 2;
     }
 
-    public ArrayDeque(int InitialSize){
-        bounds = InitialSize;
-        items = (T[]) new Object[bounds];
+    public void dequeClear() {
+        items = (T[]) new Object[8];
+        size = 0;
+        first = 0;
+        last = 0;
     }
-
     public void addFirst(T item) {
-        size = size + 1;
-        // If the array is full, increase the size of the array.
-        if (size == bounds) {
-            ResizeExpand();
+        if (size + 1 >= items.length) {
+            resize(items.length * factor);
         }
-        items[first] = item;
-        // If first is at position zero of the array, put addFirst item at the end of the array.
-        if (first - 1 < 0) {
-            first = bounds - 1;
-        } else {
-            first = first - 1;
+        if (items[first] == null) {
+            items[first] = item;
+            size ++;
+        }
+        else {
+            if (first - 1 < 0) {
+                first = items.length - 1;
+            }
+            else {
+                first = first - 1;
+            }
+            items[first] = item;
+            size ++;
         }
     }
 
     public void addLast(T item) {
-        // If the array is full, expand the array.
-        size = size + 1;
-        if (size == bounds) {
-            ResizeExpand();
+        if (size + 1 >= items.length) {
+            resize(items.length * factor);
         }
-        last = last + 1;
-        items[last] = item;
+        if (items[last] == null) {
+            items[last] = item;
+            size ++;
+        }
+        else {
+            if (last + 1 == items.length) {
+                last = 0;
+            }
+            else {
+                last = last + 1;
+            }
+            items[last] = item;
+            size ++;
+        }
+    }
+
+    // Helper method for addFirst and addLast.
+    private void resize(int newCapacity) {
+        T[] itemsCopy = items;
+        if (newCapacity <= 8) {
+            items = (T[]) new Object[8];
+        }
+        else {
+            items = (T[]) new Object[newCapacity];
+        }
+        // Check if the first item is at the back of the array.
+        if (first <= last) {
+            System.arraycopy(itemsCopy, first, items, 0, size);
+        }
+        else {
+            System.arraycopy(itemsCopy, first, items, 0, itemsCopy.length - first);
+            System.arraycopy(itemsCopy, 0, items, itemsCopy.length - first, last + 1);
+        }
+        first = 0;
+        last = size - 1;
     }
 
     public boolean isEmpty() {
-        if (size == 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return size == 0;
     }
 
     ;
@@ -60,165 +95,84 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         return size;
     }
 
-    ;
-
     public void printDeque() {
-        for (Iterator<T> iterator = this.iterator(); iterator.hasNext();){
+        for (Iterator<T> iterator = this.iterator(); iterator.hasNext();) {
             System.out.print(iterator.next() + " ");
         }
         System.out.println();
     }
 
-    ;
-
     public T removeFirst() {
-        // Test whether the array is empty
-        if (size == 0) {
-            return null;
+        if (size - 1 <= 0) {
+            T removed = items[first];
+            dequeClear();
+            return removed;
         }
-        //Save the item that is going to be removed, and delete it from the array.
-        T returnFirst;
-        if ((first + 1) == bounds) {
+        if (size - 1 < items.length % 3) {
+            resize(items.length % factor);
+        }
+        T firstItem = items[first];
+        items[first] = null;
+        size --;
+        if (first + 1 == items.length) {
             first = 0;
-            returnFirst = items[first];
-            items[first] = null;
-        } else {
+        }
+        else {
             first = first + 1;
-            returnFirst = items[first];
-            items[first] = null;
         }
-        size = size - 1;
-        if (size < (bounds / 4)) {
-            resizeShrink();
-        }
-        return returnFirst;
+        return firstItem;
     }
-
-    ;
 
     // Shrink the arraydeque if the usage is low
     public T removeLast() {
-        if (size == 0) {
+        if (size - 1 <= 0) {
             return null;
         }
-        //Save the item that is going to be removed, and delete it from the array.
-        T returnLast;
-        returnLast = items[last];
+        if (size - 1 <= items.length % 3) {
+            resize(items.length % factor);
+        }
+        T lastItem = items[last];
         items[last] = null;
-        // Check if the previous item is at zero position. If yes, put the last at the back of the array.
-        if (last == 0) {
-            last = bounds - 1;
-        } else {
+        size --;
+        if (last - 1 < 0) {
+            last = items.length - 1;
+        }
+        else {
             last = last - 1;
         }
-        size = size - 1;
-        if (size < (bounds / 4)) {
-            resizeShrink();
-        }
-        return returnLast;
+        return lastItem;
     }
 
     public T get(int index) {
-        if (index > size) {
+        if (index > size - 1) {
             return null;
         }
-        // Check if the index item is at front or the back of the array.
-        if ((bounds - first) > (index + 2)) {
-            // The index item is at the back
-            System.out.println("Return items[first + index + 1]");
-            return items[first + index + 1];
-
+        if (first + index >= items.length) {
+            return items[index - (items.length - first)];
         }
-        System.out.println("Last is " + last + ", First is " + first);
-        System.out.println("Return items[last - (size - (index + 1))]");
-        return items[last - (size - (index + 1))];
-    }
-
-    // Expand the arraydeque if overload.
-    private void ResizeExpand() {
-        T[] itemscopy = items;
-        items = (T[]) new Object[bounds * 4];
-        // Check if the first item is at the back of the array.
-        int IfFirstAtBack = (first + size);
-        if (IfFirstAtBack <= bounds) {
-            System.arraycopy(itemscopy, first, items, 0, size);
-        } else {
-            int Backsize = bounds - (first + 1);
-            // The position of the first item;
-            int RealFirst = first + 1;
-            System.arraycopy(itemscopy, (RealFirst), items, 1, (Backsize));
-            System.arraycopy(itemscopy, 0, items, (Backsize + 1), (size - Backsize));
-        }
-        first = 0;
-        last = size - 1;
-        bounds = bounds * 4;
-    }
-
-    public void resizeShrink() {
-        T[] itemscopy = items;
-        items = (T[]) new Object[bounds / 2];
-        //Check if the first item is at the back of the array.
-        int FirstNotAtBack = (first + size);
-        if (FirstNotAtBack <= bounds) {
-            System.arraycopy(itemscopy, first, items, 0, size + 1);
-        } else {
-            int Backsize = bounds - (first + 1);
-            // The position of the first item;
-            int RealFirst = first + 1;
-            System.arraycopy(itemscopy, (RealFirst), items, 1, (Backsize));
-            System.arraycopy(itemscopy, 0, items, (Backsize + 1), (size - Backsize));
-        }
-        first = 0;
-        last = size;
-        bounds = bounds / 2;
+        return items[first + index];
     }
 
     public Iterator<T> iterator() {
         return new Iterator<T>() {
-            int current = first;
+            int current = -1;
 
             @Override
             public boolean hasNext() {
-                // First is now at the last position of the array.
-                if ((current + 1) == bounds) {
-                    return items[0] != null;
-                } else {
-                    return items[current + 1] != null;
-                }
+                return get(current + 1) != null;
             }
 
             @Override
             public T next() {
-                if (hasNext()) {
-                    if ((current + 1) == bounds) {
-                        current = 0;
-                        return items[current];
-                    } else {
-                        current = current + 1;
-                        return items[current];
-                    }
-                }
-                return null;
+                T nextItem = get(current + 1);
+                current ++;
+                return nextItem;
             }
 
             @Override
             // Remove the item returned by last .next() call.
             public void remove() {
-                if (first == (bounds - 1)) {
-                    // The remove item is the first item of the arraylist.
-                    if (current == 0) {
-                        removeFirst();
-                    } else {
-                        throw new IllegalStateException("You cannot remove item that is at the middle of the array.");
-                    }
-                } else {
-                    // The remove item is the first item of the arraylist.
-                    if (current == (first + 1)) {
-                        removeFirst();
-                    } else {
-                        throw new IllegalStateException("You cannot remove item that is at the middle of the array.");
-                    }
-                }
+                throw new IllegalStateException("You cannot remove item that is at the middle of the array.");
             }
         };
     }

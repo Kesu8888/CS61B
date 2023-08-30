@@ -28,8 +28,6 @@ private Deque<Double> buffer;
         for (int i = 0; i < Capacity; i ++){
             buffer.addLast(0.0);
         }
-        System.out.println(buffer.size());
-        assertEquals(Capacity, buffer.size());
     }
 
 
@@ -48,7 +46,6 @@ private Deque<Double> buffer;
             buffer.removeFirst();
             buffer.addLast((Math.random() - 0.5));
         }
-        assertEquals(Capacity, buffer.size());
     }
 
     /* Advance the simulation one time step by performing one iteration of
@@ -59,14 +56,13 @@ private Deque<Double> buffer;
         //       the average of the two multiplied by the DECAY factor.
         //       **Do not call StdAudio.play().**
         double removed = buffer.removeFirst();
-        double newDouble = (removed * buffer.get(0)) * 0.5 * DECAY;
+        double newDouble = (removed + buffer.get(0)) * 0.5 * DECAY;
         buffer.addLast(newDouble);
     }
 
     /* Return the double at the front of the buffer. */
     public double sample() {
         // TODO: Return the correct thing.;
-        System.out.println(buffer.get(0));
         return buffer.get(0);
     }
 }

@@ -87,13 +87,15 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         }
         ListNode<T> getIndex = Sentinel;
         if (index < (size % 2)) {
-            for (int i = 0; i <= index; i++) {
+            getIndex = Sentinel.next;
+            for (int i = 1; i < index; i++) {
                 getIndex = getIndex.next;
             }
             return getIndex.item;
         }
         else {
-            for (int i = 0; i <= (size - index); i++) {
+            getIndex = Sentinel.prev;
+            for (int i = 1; i < (size - index); i++) {
                 getIndex = getIndex.prev;
             }
             return getIndex.item;

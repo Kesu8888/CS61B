@@ -25,13 +25,12 @@ public class MaxArrayDeque<T> extends ArrayDeque<T> implements Deque<T>{
             if (size <= 0){
                 return null;
             }
-            T MaxItem = items[last];
-            for (Iterator<T> iterator = this.iterator(); iterator.hasNext(); ) {
-                T IteratorItem = iterator.next();
-                if (getMaxComp.compare(MaxItem, IteratorItem) < 0){
-                    MaxItem = IteratorItem;
+            T maxItem = get(0);
+            for (int i = 1; i < size; i++) {
+                if (getMaxComp.compare(maxItem, get(i)) < 0) {
+                    maxItem = get(i);
                 }
             }
-            return MaxItem;
+            return maxItem;
         }
 }
