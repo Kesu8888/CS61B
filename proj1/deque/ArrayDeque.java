@@ -24,16 +24,19 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         last = 0;
     }
     public void addFirst(T item) {
-        if (size + 1 >= items.length) {
+        if (size + 1 >= items.length)
+        {
             resize(items.length * factor);
         }
-        if (items[first] == null) {
+        if (items[first] == null)
+        {
             items[first] = item;
             size++;
         }
         else
         {
-            if (first - 1 < 0) {
+            if (first - 1 < 0)
+            {
                 first = items.length - 1;
             }
             else
