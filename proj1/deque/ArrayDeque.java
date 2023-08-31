@@ -30,10 +30,10 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         if (items[first] == null) {
             items[first] = item;
             size++;
-        }else {
+        } else {
             if (first - 1 < 0) {
                 first = items.length - 1;
-            }else {
+            } else {
                 first = first - 1;
             }
             items[first] = item;
@@ -48,10 +48,10 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         if (items[last] == null) {
             items[last] = item;
             size++;
-        }else {
+        } else {
             if (last + 1 == items.length) {
                 last = 0;
-            }else {
+            } else {
                 last = last + 1;
             }
             items[last] = item;
@@ -64,13 +64,13 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         T[] itemsCopy = items;
         if (newCapacity <= 8) {
             items = (T[]) new Object[8];
-        }else {
+        } else {
             items = (T[]) new Object[newCapacity];
         }
         // Check if the first item is at the back of the array.
         if (first <= last) {
             System.arraycopy(itemsCopy, first, items, 0, size);
-        }else {
+        } else {
             System.arraycopy(itemsCopy, first, items, 0, itemsCopy.length - first);
             System.arraycopy(itemsCopy, 0, items, itemsCopy.length - first, last + 1);
         }
@@ -100,10 +100,10 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         }
         T firstItem = items[first];
         items[first] = null;
-        size --;
+        size--;
         if (first + 1 == items.length) {
             first = 0;
-        }else {
+        } else {
             first = first + 1;
         }
         return firstItem;
@@ -119,10 +119,10 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         }
         T lastItem = items[last];
         items[last] = null;
-        size --;
+        size--;
         if (last - 1 < 0) {
             last = items.length - 1;
-        }else {
+        } else {
             last = last - 1;
         }
         return lastItem;
