@@ -1,9 +1,8 @@
 package deque;
-import java.util.Arrays;
 import java.util.Iterator;
 
 
-public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
+public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     private int size;
     private T[] items;
     private int first;
@@ -30,7 +29,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         }
         if (items[first] == null) {
             items[first] = item;
-            size ++;
+            size++;
         }
         else {
             if (first - 1 < 0) {
@@ -40,7 +39,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
                 first = first - 1;
             }
             items[first] = item;
-            size ++;
+            size++;
         }
     }
 
@@ -50,7 +49,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         }
         if (items[last] == null) {
             items[last] = item;
-            size ++;
+            size++;
         }
         else {
             if (last + 1 == items.length) {
@@ -84,12 +83,6 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         first = 0;
         last = size - 1;
     }
-
-    public boolean isEmpty() {
-        return size == 0;
-    }
-
-    ;
 
     public int size() {
         return size;
