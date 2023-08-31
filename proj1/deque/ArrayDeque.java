@@ -113,8 +113,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         if (size - 1 <= 0) {
             return null;
         }
-        if (size - 1 <= items.length % 3)
-        {
+        if (size - 1 <= items.length % 3) {
             resize(items.length % factor);
         }
         T lastItem = items[last];
@@ -157,17 +156,17 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             @Override
             // Remove the item returned by last .next() call.
             public void remove() {
-                throw new IllegalStateException("You cannot remove item that is at the middle of the array.");
+                throw new IllegalStateException();
             }
         };
     }
 
     public boolean equals(Object o) {
         if (o instanceof ArrayDeque) {
-            ArrayDeque<?> ComDeque = (ArrayDeque<?>) o;
-            if (size == ComDeque.size) {
+            ArrayDeque<?> comDeque = (ArrayDeque<?>) o;
+            if (size == comDeque.size) {
                 for (int i = 0; i < size; i++) {
-                    if (this.get(i) != ComDeque.get(i)) {
+                    if (this.get(i) != comDeque.get(i)) {
                         return false;
                     }
                 }

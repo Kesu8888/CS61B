@@ -21,13 +21,13 @@ public class MaxArrayDeque<T> extends ArrayDeque<T> {
 
     private T getMax(Comparator<T> getMaxComp) {
         if (super.size() == 0) {
-                return null;
+            return null;
         }
         T maxItem = super.get(0);
         for (int i = 1; i < size(); i++) {
-                if (getMaxComp.compare(maxItem, super.get(i)) < 0) {
-                    maxItem = super.get(i);
-                }
+            if (getMaxComp.compare(maxItem, super.get(i)) < 0) {
+                maxItem = super.get(i);
+            }
         }
         return maxItem;
     }

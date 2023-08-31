@@ -1,9 +1,9 @@
 package deque;
 
 public class ListNode<T> {
-    public T item;
-    public ListNode<T> prev;
-    public ListNode<T> next;
+    protected T item;
+    protected ListNode<T> prev;
+    protected ListNode<T> next;
 
     public ListNode(ListNode<T> p, T i, ListNode<T> n) {
         item = i;
