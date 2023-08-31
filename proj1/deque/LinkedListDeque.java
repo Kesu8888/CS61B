@@ -2,7 +2,7 @@ package deque;
 import java.lang.*;
 import java.util.Iterator;
 
-public class LinkedListDeque<T> implements Deque<T>{
+public class LinkedListDeque<T> implements Deque<T>, Iterable<T>{
     private int size;
     private final ListNode<T> Sentinel;
 
@@ -102,8 +102,8 @@ public class LinkedListDeque<T> implements Deque<T>{
         }
     }
 
-        public Iterator<T> iterator () {
-            return new Iterator<T>() {
+    public Iterator<T> iterator () {
+        return new Iterator<T>() {
                 ListNode<T> current = Sentinel;
 
                 @Override
@@ -128,35 +128,35 @@ public class LinkedListDeque<T> implements Deque<T>{
                     nextNode.prev = prevNode;
                     size--;
                 }
-            };
-        }
+        };
+    }
 
-        public T getRecursion (int index){
-            if (index >= size) {
-                return null;
-            }
-            return RecursionHelper(Sentinel.next, index);
+    public T getRecursive(int index) {
+        if (index >= size) {
+            return null;
         }
+        return RecursionHelper(Sentinel, index);
+    }
 
-        private T RecursionHelper (ListNode < T > Node,int index){
-            if (index < 0) {
-                return Node.item;
-            }
-            return RecursionHelper(Node.next, index - 1);
+    private T RecursionHelper (ListNode < T > Node,int index){
+        if (index < 0) {
+            return Node.item;
         }
+        return RecursionHelper(Node.next, index - 1);
+    }
 
-        public boolean equals (Object o){
-            if (o instanceof LinkedListDeque) {
-                LinkedListDeque<?> comDeque = (LinkedListDeque<?>) o;
-                if (comDeque.size == this.size) {
-                    return allItems() == comDeque.allItems();
-                }
-                return false;
+    public boolean equals (Object o){
+        if (o instanceof LinkedListDeque) {
+            LinkedListDeque<?> comDeque = (LinkedListDeque<?>) o;
+            if (comDeque.size == this.size) {
+                return allItems() == comDeque.allItems();
             }
             return false;
         }
+        return false;
+    }
 
-        public T[] allItems() {
+    public T[] allItems() {
         T[] items = (T[]) new Object[size];
         ListNode<T> Node = Sentinel;
         for (int i = 0; i< size; i++) {
@@ -164,8 +164,8 @@ public class LinkedListDeque<T> implements Deque<T>{
             items[i] = Node.item;
         }
         return items;
-        }
     }
+}
 
 
 
