@@ -116,7 +116,6 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     public T removeLast() {
         if (size - 1 <= 0) {
             T removed = items[last];
-            items[last] = null;
             dequeClear();
             return removed;
         }
