@@ -9,9 +9,9 @@ public class GuitarString {
     private Deque<Double> buffer;
 
     public GuitarString(double frequency) {
-        int Capacity = (int) Math.round(SR / frequency);
+        int capacity = (int) Math.round(SR / frequency);
         buffer = new LinkedListDeque<>();
-        for (int i = 0; i < Capacity; i++) {
+        for (int i = 0; i < capacity; i++) {
             buffer.addLast(0.0);
         }
     }
@@ -19,7 +19,6 @@ public class GuitarString {
 
     /* Pluck the guitar string by replacing the buffer with white noise. */
     public void pluck() {
-        int Capacity = buffer.size();
         for (int i = 0; i < buffer.size(); i++) {
             buffer.removeFirst();
             buffer.addLast((Math.random() - 0.5));

@@ -23,6 +23,10 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         first = 0;
         last = 0;
     }
+
+    public boolean isEmpty() {
+        return size == 0;
+    }
     public void addFirst(T item) {
         if (size + 1 >= items.length) {
             resize(items.length * factor);
@@ -111,7 +115,10 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
 
     public T removeLast() {
         if (size - 1 <= 0) {
-            return null;
+            T removed = items[last];
+            items[last] = null;
+            dequeClear();
+            return removed;
         }
         if (size - 1 <= items.length % 3) {
             resize(items.length % factor);
