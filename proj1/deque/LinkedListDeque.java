@@ -101,6 +101,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
                 public T next() {
                     if (hasNext()) {
                         current = current.next;
+                        System.out.println(current.item);
                         return current.item;
                     }
                     return null;
@@ -132,6 +133,22 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
     }
 
     public boolean equals(Object o) {
+        if (o instanceof Deque) {
+            Deque<?> comDeque = (Deque<?>) o;
+            if (comDeque.size() == size) {
+                myComparator comparator = new myComparator();
+                for (int i = 0; i < size; i++) {
+                    if (!comparator.compare(this.get(i), comDeque.get(i))) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+        return false;
+    }
+    /*public boolean equals(Object o) {
         if (o instanceof LinkedListDeque) {
             LinkedListDeque<?> comDeque = (LinkedListDeque<?>) o;
             if (comDeque.size == this.size) {
@@ -147,6 +164,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         }
         return false;
     }
+    */
 }
 
 

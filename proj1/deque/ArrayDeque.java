@@ -168,6 +168,20 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     }
 
     public boolean equals(Object o) {
+        if (o instanceof Deque) {
+            Deque<?> comDeque = (Deque<?>) o;
+            if (comDeque.size() == size) {
+                myComparator comparator = new myComparator();
+                for (int i = 0; i < size; i++) {
+                    if (comparator.compare(this.get(i), comDeque.get(i))) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+    }
+    /*public boolean equals(Object o) {
         if (o instanceof ArrayDeque) {
             ArrayDeque<?> comDeque = (ArrayDeque<?>) o;
             if (size == comDeque.size) {
@@ -181,7 +195,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             return false;
         }
         return false;
-    }
+    }*/
 }
 
 
