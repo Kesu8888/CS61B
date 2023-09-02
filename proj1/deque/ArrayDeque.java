@@ -24,9 +24,6 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         last = 0;
     }
 
-    public boolean isEmpty() {
-        return size == 0;
-    }
     public void addFirst(T item) {
         if (size + 1 >= items.length) {
             resize(items.length * factor);
@@ -173,7 +170,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             if (comDeque.size() == size) {
                 MyComparator comparator = new MyComparator();
                 for (int i = 0; i < size; i++) {
-                    if (comparator.compare(this.get(i), comDeque.get(i))) {
+                    if (!comparator.compare(this.get(i), comDeque.get(i))) {
                         return false;
                     }
                 }
