@@ -1,7 +1,9 @@
 package deque;
+
 import org.junit.Test;
 import static org.junit.Assert.*;
 public class LinkedListTest {
+
     @Test
     public void equalsTest() {
         Deque<Integer> lld1 = new LinkedListDeque<>();
@@ -19,9 +21,9 @@ public class LinkedListTest {
         assertEquals("They are not equals", true, lld1.equals(lld3));
     }
     @Test
-    public void ArrayDequeTest() {
+    public void arrayDequeTest() {
         Deque<Integer> ad1 = new ArrayDeque<>();
         ad1.addFirst(0);
-        assertEquals("They are not equal", 0, (int)ad1.removeLast());
+        assertEquals("They are not equal", 0, (int) ad1.removeLast());
     }
 }

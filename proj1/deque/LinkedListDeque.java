@@ -136,7 +136,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         if (o instanceof Deque) {
             Deque<?> comDeque = (Deque<?>) o;
             if (comDeque.size() == size) {
-                myComparator comparator = new myComparator();
+                MyComparator comparator = new MyComparator();
                 for (int i = 0; i < size; i++) {
                     if (!comparator.compare(this.get(i), comDeque.get(i))) {
                         return false;
