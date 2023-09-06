@@ -31,6 +31,9 @@ public class TestMyHashMap {
         for (int i = 0; i < 455; i++) {
             b.put("hi" + i, 1);
             //make sure put is working via containsKey and get
+            System.out.println("hi" + i);
+            System.out.println(null != b.get("hi" + i));
+            System.out.println(b.containsKey("hi" + i));
             assertTrue(null != b.get("hi" + i)
                     && b.containsKey("hi" + i));
         }
