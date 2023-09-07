@@ -2,15 +2,38 @@ package gitlet;
 
 // TODO: any imports you need here
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date; // TODO: You'll likely use this in this class
 
-/** Represents a gitlet commit object.
- *  TODO: It's a good idea to give a description here of what else this Class
- *  does at a high level.
- *
- *  @author TODO
+ /*  @author FU KAIQI
  */
-public class Commit {
+
+public class Commit implements Serializable {
+
+    private String message;
+    private String timestamp;
+    private String parent;
+
+    public Commit(String message, String parent) {
+        this.parent = parent;
+        this.message = message;
+        if (this.parent == null) {
+            this.timestamp = new Date().toString();
+        }
+    }
+
+    public String getCommit() {
+        return this.message;
+    }
+
+    public String getTimestamp() {
+        return this.timestamp;
+    }
+
+    public String getParent() {
+        return this.parent;
+    }
     /**
      * TODO: add instance variables here.
      *

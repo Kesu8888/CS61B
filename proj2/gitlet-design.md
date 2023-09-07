@@ -1,10 +1,28 @@
 # Gitlet Design Document
 
-**Name**:
+**Name**: Fu kaiQi
 
 ## Classes and Data Structures
 
-### Class 1
+### Main Class
+1. Main class should implement the "add", "Commit", 
+and "init" function.
+2. Since the Main Class should not be too long and 
+messy, we create an static class to implement all 
+the method and make Main class just a call machine.
+
+### callMachine
+callMachine class will have "add", "Commit" and "init"
+method.
+1. init() 
+This is a method which create a new repository and a 
+Root commit file;
+
+### Commit
+Instance Variable:
+1. Message - contains the commit message
+2. TimeStamp - contains the time of commit
+3. Parent - contains the last commit item
 
 #### Fields
 
