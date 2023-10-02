@@ -59,6 +59,8 @@ public class Main {
             validateNumArgs("birthday", args, 2);
             CapersRepository.celebrateBirthday(args[1]);
             break;
+        case "count":
+            CapersRepository.count();
         default:
             exitWithError(String.format("Unknown command: %s", args[0]));
         }

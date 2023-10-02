@@ -2,6 +2,7 @@ package capers;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 
 import static capers.Utils.*;
 
@@ -91,5 +92,8 @@ public class CapersRepository {
         Dog dogBirthday = Dog.fromFile(name);
         dogBirthday.haveBirthday();
         // TODO
+    }
+    public static void count() {
+        Collection<File> files = Utils.
     }
 }

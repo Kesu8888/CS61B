@@ -1,12 +1,12 @@
 package gitlet;
 
 // TODO: any imports you need here
+import com.sun.source.tree.Tree;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Date; // TODO: You'll likely use this in this class
-
- /*  @author FU KAIQI
+import java.util.ArrayList;
+import java.util.TreeMap;
+/*  @author FU KAIQI
  */
 
 public class Commit implements Serializable {
@@ -14,36 +14,68 @@ public class Commit implements Serializable {
     private String message;
     private String timestamp;
     private String parent;
+    private String myID;
+    private TreeMap<String, String> trackedFiles;
+    private String log;
 
-    public Commit(String message, String parent) {
+    public Commit(String message, String parent, TreeMap<String, String> trackedFiles) {
         this.parent = parent;
         this.message = message;
-        if (this.parent == null) {
-            this.timestamp = new Date().toString();
-        }
+        this.timestamp = Date.getDateNow();
+        this.myID = Utils.sha1(toString());
+        this.trackedFiles = trackedFiles;
+        log = writeLog();
+    }
+    public Commit(String message, String parent, String timestamp) {
+        this.parent = parent;
+        this.message = message;
+        this.timestamp = timestamp;
+        this.myID = Utils.sha1(message + timestamp + parent);
+        trackedFiles = new TreeMap<>();
+        trackedFiles.put(this.myID, null);
+        trackedFiles.remove(this.myID);
+        log = writeLog();
     }
 
-    public String getCommit() {
+    public void mergeLog(String mergeLog) {
+        String commitID = "===\n" + "commit " + myID + " \n";
+        String Date = "Date: " + timestamp + "\n";
+        String msg = message +"\n";
+        log = commitID + mergeLog + Date + msg;
+    }
+
+    public String getMyID() {
+        return myID;
+    }
+
+    public String getLog() {
+        return log;
+    }
+    public String getMsg() {
         return this.message;
     }
 
-    public String getTimestamp() {
-        return this.timestamp;
+    public TreeMap<String, String> getTrack() {
+        return this.trackedFiles;
+    }
+
+    public String toString() {
+        return message + timestamp + parent;
     }
 
     public String getParent() {
-        return this.parent;
+        if (parent == null) {
+            return null;
+        }
+        return this.parent.substring(0, 40);
     }
-    /**
-     * TODO: add instance variables here.
-     *
-     * List all instance variables of the Commit class here with a useful
-     * comment above them describing what that variable represents and how that
-     * variable is used. We've provided one example for `message`.
-     */
 
-    /** The message of this Commit. */
-    private String message;
 
-    /* TODO: fill in the rest of this class. */
+    //Helper methods
+    private String writeLog() {
+        String commitID = "===" + "\n" + "commit " + myID + " \n";
+        String Date = "Date: " + timestamp + "\n";
+        String msg = message +"\n";
+        return commitID + Date + msg;
+    }
 }

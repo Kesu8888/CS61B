@@ -1,0 +1,14 @@
+# === Branches ===
+\*master
+
+=== Staged Files ===
+
+=== Removed Files ===
+
+=== Modifications Not Staged For Commit ===
+Hello1.txt (modified)
+Hello2.txt (modified)
+wug1.txt (modified)
+
+=== Untracked Files ===
+${ARBLINES}
