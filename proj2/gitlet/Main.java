@@ -13,6 +13,13 @@ public class Main {
      */
     public static void main(String[] args){
         // TODO: what if args is empty?
+        if (args.length == 0) {
+            System.out.println("Please enter a command.");
+            return;
+        }
+        if (!args[0].equals("init")) {
+            Repository.initializeCheck();
+        }
         String firstArg = args[0];
         switch(firstArg) {
             case "init":
@@ -48,11 +55,15 @@ public class Main {
                     Repository.checkoutBranch(args[1]);
                     break;
                 }
-                if (args.length == 3) {
+                if (args.length == 3 & args[1].equals("--")) {
                     Repository.checkoutFile(args[2]);
                     break;
                 }
-                Repository.checkoutCommitFile(args[1], args[3]);
+                if (args.length == 3 & args[2].equals("--")) {
+                    Repository.checkoutCommitFile(args[1], args[3]);
+                    break;
+                }
+                System.out.println("Incorrect operands.");
                 break;
             case "branch":
                 Repository.branch(args[1]);
@@ -66,6 +77,8 @@ public class Main {
             case "merge":
                 Repository.merge(args[1]);
                 break;
+            default:
+                System.out.println("No command with that name exists.");
         }
     }
 }

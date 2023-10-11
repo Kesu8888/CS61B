@@ -23,11 +23,13 @@ public class RecordList implements Serializable {
     public void removeBranch(String branchName) {
         if (!branchExist(branchName)) {
             System.out.println("A branch with that name does not exist.");
+            System.exit(0);
         }
-        if (!currentBranch.equals(branchName)) {
-            recordFile.remove(branchName);
+        if (currentBranch.equals(branchName)) {
+            System.out.println("Cannot remove the current branch.");
+            System.exit(0);
         }
-        System.out.println("Cannot remove the current branch.");
+        recordFile.remove(branchName);
     }
 
     public String getCurrentBranchName() {

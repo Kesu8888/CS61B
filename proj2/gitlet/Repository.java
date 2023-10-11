@@ -40,15 +40,6 @@ public class Repository implements Serializable {
     public static final File commitFolder = join(GITLET_DIR, "commitFolder");
     public static final File trackFolder = join(GITLET_DIR, "trackFolder");
     public static final File recording = join(GITLET_DIR, "recording");
-    public void repositorySetup() {
-        if (!GITLET_DIR.exists()) {
-            GITLET_DIR.mkdirs();
-            stageAdd.mkdirs();
-            stageDel.mkdirs();
-            commitFolder.mkdirs();
-            trackFolder.mkdirs();
-        }
-    }
 
     // Create a Initial Commit and create a master branch
     public static void init() {
@@ -99,7 +90,7 @@ public class Repository implements Serializable {
 
     public static void Commit(String commitMsg) {
         if (commitMsg.length() == 0) {
-            System.out.println("Commit message with blank message");
+            System.out.println("Please enter a commit message.");
             return;
         }
         TreeMap<String, String> trackFiles = committing();
@@ -215,7 +206,7 @@ public class Repository implements Serializable {
         statusTxt = combineString(statusTxt, MBNS) + "\n";
         statusTxt = combineString(statusTxt, untracked);
         System.out.println(statusTxt);
-        writeContents(join(CWD, "testStatus"), statusTxt);
+        //writeContents(join(CWD, "testStatus"), statusTxt);
     }
 
     public static void checkoutBranch(String branchName) {
@@ -426,9 +417,9 @@ public class Repository implements Serializable {
         for (Map.Entry<String, String> entry : commitTrack.entrySet()) {
             File trackFileInCWD = join(CWD, entry.getKey());
             if (trackFileInCWD.exists() & !currentTrack.containsKey(entry.getKey())) {
-                System.out.println("There is an untracked file in the way; " +
-                    "delete it, or add and commit it first.");
-                System.exit(2);
+                System.out.println("There is an untracked file in the way; delete it, " +
+                    "or add and commit it first.");
+                System.exit(0);
             }
         }
         for (Map.Entry<String, String> entry : commitTrack.entrySet()) {
@@ -553,5 +544,12 @@ public class Repository implements Serializable {
             s = s + S;
         }
         return s;
+    }
+    public static void initializeCheck() {
+        File IC = join(commitFolder, UID);
+        if (!IC.exists()) {
+            System.out.println("Not in an initialized Gitlet directory.");
+            System.exit(0);
+        }
     }
 }
