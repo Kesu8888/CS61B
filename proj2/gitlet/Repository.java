@@ -85,18 +85,16 @@ public class Repository implements Serializable {
             return;
         }
         if (trackFiles.containsKey(fileName)) {
+            join(stageDel, fileName).delete();
             byte[] contentCopy = Utils.readContents(sourceFile);
             if (Utils.sha1(contentCopy).equals(trackFiles.get(fileName))) {
-                File fileInStageAdd = join(stageAdd, fileName);
-                if (fileInStageAdd.exists()) {
-                    fileInStageAdd.delete();
-                }
+                join(stageAdd, fileName).delete();
                 return;
             }
             addToStage(fileName);
+        } else {
+            addToStage(fileName);
         }
-        addToStage(fileName);
-
     }
 
     public static void Commit(String commitMsg) {
@@ -109,15 +107,16 @@ public class Repository implements Serializable {
     public static void rm(String fileName) {
         List<String> stageAddFolder = plainFilenamesIn(stageAdd);
         TreeMap<String, String> trackFile = getCurrentTrack();
-        if (!stageAddFolder.contains(fileName) & !trackFile.containsKey(fileName)) {
+        if (trackFile.containsKey(fileName)) {
+            join(stageAdd, fileName).delete();
+            join(CWD, fileName).delete();
+            byte[] fileContent = readContents(join(trackFolder, trackFile.get(fileName)));
+            writeContents(join(stageDel, fileName), fileContent);
+        } else if(stageAddFolder.contains(fileName)) {
+            join(stageAdd, fileName).delete();
+        } else {
             System.out.println("No reason to remove the file.");
-            return;
         }
-
-        join(stageAdd, fileName).delete();
-        join(CWD, fileName).delete();
-        byte[] fileContent = readContents(join(trackFolder, trackFile.get(fileName)));
-        writeContents(join(stageDel, fileName), fileContent);
     }
     public static void log() {
         if (!join(commitFolder, UID).exists()) {
@@ -154,54 +153,65 @@ public class Repository implements Serializable {
     }
 
     public static void status() {
-        //Get branches
-        String testStatusFile = statusBranchList();
-        TreeMap<String, String> testMap = new TreeMap<>();
-        List<String> stageFolderAdd = Utils.plainFilenamesIn(stageAdd);
-        String stageFiles = "=== Staged Files ===" + "\n";
-        for (String s : stageFolderAdd) {
-            stageFiles = stageFiles + s + "\n";
-        }
-        testStatusFile = testStatusFile + stageFiles + "\n";
-
-        List<String> stageFolderDel = Utils.plainFilenamesIn(stageDel);
-        String deleteFiles = "=== Removed Files ===" + "\n";
-        for (String s : stageFolderDel) {
-            deleteFiles = deleteFiles + s + "\n";
-        }
-        testStatusFile = testStatusFile + deleteFiles + "\n";
-
-        TreeMap<String, String> trackFiles = getCurrentTrack();
-        String modifiedFiles = "=== Modifications Not Staged For Commit ===" + "\n";
-        for (Map.Entry<String, String> entry : trackFiles.entrySet()) {
-            if (!stageFolderAdd.contains(entry.getKey()) &
-                !stageFolderDel.contains(entry.getKey())) {
-                File inCWD = join(CWD, entry.getKey());
-                if (!inCWD.exists()) {
-                    modifiedFiles = modifiedFiles + entry.getKey() + " (deleted)\n";
-                    continue;
-                }
-                byte[] contentOfFile = Utils.readContents(inCWD);
-                if (!entry.getValue().equals(Utils.sha1(contentOfFile))) {
-                    modifiedFiles = modifiedFiles + entry.getKey() + " (modified)" + "\n";
-                }
+        //Initialize list
+        List<String> branchList = new ArrayList<>();
+        List<String> addList = new ArrayList<>();
+        addList.add("=== Staged Files ===" + "\n");
+        List<String> delList = new ArrayList<>();
+        delList.add("=== Removed Files ===" + "\n");
+        List<String> MBNS = new ArrayList<>();
+        MBNS.add("=== Modifications Not Staged For Commit ===" + "\n");
+        List<String> untracked = new ArrayList<>();
+        untracked.add("=== Untracked Files ===" + "\n");
+        //Fill in branchList
+        RecordList record = Utils.readObject(recording, RecordList.class);
+        String headBranch = record.getCurrentBranchName();
+        String branchTitle = "=== Branches ===" + "\n" + "*" + headBranch + "\n";
+        branchList.add(branchTitle);
+        for (Map.Entry<String, String> entry : record.getRecordFile().entrySet()) {
+            if (!entry.getKey().equals(headBranch)) {
+                branchList.add(entry.getKey() + "\n");
             }
         }
-        testStatusFile = testStatusFile + modifiedFiles + "\n";
-
-        String untrackedFiles = "=== Untracked Files ===" + "\n";
+        //Fill in stageAddList
+        List<String> stageAddFolder = plainFilenamesIn(stageAdd);
+        for (String inStageAdd : stageAddFolder) {
+            addList.add(inStageAdd + "\n");
+            File inStageAddFile = join(stageAdd, inStageAdd);
+            MBNS = statusMBNS(MBNS, sha1(readContents(inStageAddFile)), inStageAdd);
+        }
+        //Fill in stageDel list
+        List<String> stageDelFolder = plainFilenamesIn(stageDel);
+        for (String inStageDel : stageDelFolder) {
+            delList.add(inStageDel + "\n");
+        }
+        Map<String, String> trackFiles = getCurrentTrack();
+        for (Map.Entry<String, String> entry : trackFiles.entrySet()) {
+            if (stageAddFolder.contains(entry.getKey()) | stageAddFolder.contains(entry.getKey())) {
+                continue;
+            }
+            MBNS = statusMBNS(MBNS, entry.getValue(), entry.getKey());
+        }
+        //Fill in untrackList
         List<String> allFilesInCWD = Utils.plainFilenamesIn(CWD);
         for (String s : allFilesInCWD) {
             File file = join(CWD, s);
+            if (trackFiles.containsKey(s) | stageAddFolder.contains(s)) {
+                continue;
+            }
             if (file.isDirectory()) {
                 continue;
             }
-            if (!trackFiles.containsKey(s)) {
-                untrackedFiles = untrackedFiles + s + "\n";
-            }
+            untracked.add(s + "\n");
         }
-        testStatusFile = testStatusFile + untrackedFiles + "\n";
-        System.out.println(testStatusFile);
+        String statusTxt = "";
+        statusTxt = combineString(statusTxt, branchList) + "\n";
+        statusTxt = combineString(statusTxt, addList) + "\n";
+        statusTxt = combineString(statusTxt, delList) + "\n";
+        statusTxt = combineString(statusTxt, MBNS) + "\n";
+        statusTxt = combineString(statusTxt, untracked);
+        System.out.println(statusTxt);
+        writeContents(join(CWD, "testStatus.txt"), statusTxt);
     }
 
     public static void checkoutBranch(String branchName) {
@@ -398,17 +408,7 @@ public class Repository implements Serializable {
         Commit branchHeadCommit = getCommit(commitID);
         return branchHeadCommit.getTrack();
     }
-    private static String statusBranchList() {
-        RecordList record = Utils.readObject(recording, RecordList.class);
-        String headBranch = record.getCurrentBranchName();
-        String branchList = "=== Branches ===" + "\n" + "*" + headBranch + "\n";
-        for (Map.Entry<String, String> entry : record.getRecordFile().entrySet()) {
-            if (!entry.getKey().equals(headBranch)) {
-                branchList = branchList + entry.getKey() + "\n";
-            }
-        }
-        return branchList + "\n";
-    }
+
     private static void deleteFolder(File file) {
         List<String> fileList = plainFilenamesIn(file);
         for (String s : fileList) {
@@ -531,5 +531,23 @@ public class Repository implements Serializable {
             }
         }
         return trackFiles;
+    }
+    private static List<String> statusMBNS(List<String> MBNS, String content, String fileName) {
+        File inCWD = join(CWD, fileName);
+        if (inCWD.exists()) {
+            byte[] inCWDContent = readContents(inCWD);
+            if (!content.equals(sha1(inCWDContent))) {
+                MBNS.add(fileName + " (modified)" + "\n");
+            }
+        } else {
+            MBNS.add(fileName + " (deleted)" + "\n");
+        }
+        return MBNS;
+    }
+    private static String combineString(String s, List<String> stringList) {
+        for (String S : stringList) {
+            s = s + S;
+        }
+        return s;
     }
 }

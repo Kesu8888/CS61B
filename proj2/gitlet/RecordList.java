@@ -19,6 +19,7 @@ public class RecordList implements Serializable {
         }
         recordFile.put(branchName, recordFile.get(currentBranch));
     }
+
     public void removeBranch(String branchName) {
         if (!branchExist(branchName)) {
             System.out.println("A branch with that name does not exist.");
@@ -28,6 +29,7 @@ public class RecordList implements Serializable {
         }
         System.out.println("Cannot remove the current branch.");
     }
+
     public String getCurrentBranchName() {
         return currentBranch;
     }
@@ -39,6 +41,7 @@ public class RecordList implements Serializable {
     public boolean branchExist(String branchName) {
         return recordFile.containsKey(branchName);
     }
+
     public String getHeadCommit(String branchName) {
         if (!branchExist(branchName)) {
             System.out.println("A branch with that name does not exist.");
@@ -54,7 +57,9 @@ public class RecordList implements Serializable {
     public TreeMap<String, String> getRecordFile() {
         return recordFile;
     }
+
     public void switchBranch(String branchName) {
         currentBranch = branchName;
     }
- }
+}
+
