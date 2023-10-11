@@ -211,7 +211,6 @@ public class Repository implements Serializable {
         statusTxt = combineString(statusTxt, MBNS) + "\n";
         statusTxt = combineString(statusTxt, untracked);
         System.out.println(statusTxt);
-        writeContents(join(CWD, "testStatus.txt"), statusTxt);
     }
 
     public static void checkoutBranch(String branchName) {
