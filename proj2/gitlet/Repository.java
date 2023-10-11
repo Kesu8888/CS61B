@@ -98,6 +98,10 @@ public class Repository implements Serializable {
     }
 
     public static void Commit(String commitMsg) {
+        if (commitMsg.length() == 0) {
+            System.out.println("Commit message with blank message");
+            return;
+        }
         TreeMap<String, String> trackFiles = committing();
         Commit currentCommit = getHeadCommit();
         Commit newCommit = new Commit(commitMsg, currentCommit.getMyID(), trackFiles);
@@ -187,7 +191,7 @@ public class Repository implements Serializable {
         }
         Map<String, String> trackFiles = getCurrentTrack();
         for (Map.Entry<String, String> entry : trackFiles.entrySet()) {
-            if (stageAddFolder.contains(entry.getKey()) | stageAddFolder.contains(entry.getKey())) {
+            if (stageAddFolder.contains(entry.getKey()) | stageDelFolder.contains(entry.getKey())) {
                 continue;
             }
             MBNS = statusMBNS(MBNS, entry.getValue(), entry.getKey());
@@ -211,6 +215,7 @@ public class Repository implements Serializable {
         statusTxt = combineString(statusTxt, MBNS) + "\n";
         statusTxt = combineString(statusTxt, untracked);
         System.out.println(statusTxt);
+        writeContents(join(CWD, "testStatus"), statusTxt);
     }
 
     public static void checkoutBranch(String branchName) {
@@ -389,7 +394,7 @@ public class Repository implements Serializable {
         File commitFile = join(commitFolder, commitID);
         if (!commitFile.exists()) {
             System.out.println("No commit with that id exists.");
-            System.exit(2);
+            System.exit(0);
         }
         return Utils.readObject(commitFile, Commit.class);
     }
