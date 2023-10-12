@@ -2,10 +2,8 @@ package gitlet;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
+import java.util.LinkedList;
 
 import static gitlet.Utils.*;
 
@@ -267,7 +265,7 @@ public class Repository implements Serializable {
         RecordList record = readObject(recording, RecordList.class);
         String givenBranchHead = record.getHeadCommit(givenBranch);
         String currentBranchHead = record.getHeadCommit();
-        if (givenBranchHead.equals(currentBranchHead)) {
+        if (givenBranch.equals(record.getCurrentBranchName())) {
             System.out.println("Cannot merge a branch with itself.");
             return;
         }
@@ -288,9 +286,10 @@ public class Repository implements Serializable {
         TreeMap<String, String> currentHeadFiles = getCurrentTrack();
         TreeMap<String, String> givenHeadFiles = getTrack(givenBranchHead);
         TreeMap<String, String> splitPointFiles = getTrack(splitPoint);
+        List<String> CWDFiles = plainFilenamesIn(CWD);
         for (Map.Entry<String, String> entry : givenHeadFiles.entrySet()) {
             String k = entry.getKey();
-            if (!currentHeadFiles.containsKey(k) & !splitPointFiles.containsKey(k)) {
+            if (!currentHeadFiles.containsKey(k) & CWDFiles.contains(k)) {
                 System.out.println("There is an untracked file in the way; " +
                     "delete it, or add and commit it first.");
                 return;
@@ -435,19 +434,19 @@ public class Repository implements Serializable {
         deleteFolder(stageAdd);
         deleteFolder(stageDel);
     }
-    private static List<String> getBranchFamily(String headCommitID) {
-        List<String> branchFamily = new ArrayList<>();
+    private static LinkedList<String> getBranchFamily(String headCommitID) {
+        LinkedList<String> branchFamily = new LinkedList<>();
         branchFamily.add(headCommitID);
         for (Commit head = getCommit(headCommitID); head.getParent() != null;) {
             head = readObject(join(commitFolder, head.getParent()), Commit.class);
-            branchFamily.add(head.getMyID());
+            branchFamily.addFirst(head.getMyID());
         }
         return branchFamily;
     }
 
     private static String getSplitPoint(String head1, String head2) {
-        List<String> head1Family = getBranchFamily(head1);
-        List<String> head2Family = getBranchFamily(head2);
+        LinkedList<String> head1Family = getBranchFamily(head1);
+        LinkedList<String> head2Family = getBranchFamily(head2);
         String splitPoint = head2Family.get(0);
         for (int i = 1; i < head1Family.size(); i++) {
             if ((i + 1) > head2Family.size()) {
