@@ -435,29 +435,30 @@ public class Repository implements Serializable {
         deleteFolder(stageAdd);
         deleteFolder(stageDel);
     }
-    private static TreeMap<String, String> getBranchFamily(String headCommit) {
-        TreeMap<String, String> branchFamily = new TreeMap<>();
-        Commit loopCommit = getCommit(headCommit);
-        branchFamily.put(loopCommit.getMyID(), "1");
-        for (String parent = loopCommit.getParent(); parent != null;) {
-            File parentFile = join(commitFolder, parent);
-            Commit parentCommit = readObject(parentFile, Commit.class);
-            parent = parentCommit.getParent();
-            branchFamily.put(loopCommit.getMyID(), "1");
+    private static List<String> getBranchFamily(String headCommitID) {
+        List<String> branchFamily = new ArrayList<>();
+        branchFamily.add(headCommitID);
+        for (Commit head = getCommit(headCommitID); head.getParent() != null;) {
+            head = readObject(join(commitFolder, head.getParent()), Commit.class);
+            branchFamily.add(head.getMyID());
         }
         return branchFamily;
     }
 
     private static String getSplitPoint(String head1, String head2) {
-        TreeMap<String, String> head2Family = getBranchFamily(head2);
-        while (!head2Family.containsKey(head1)) {
-            if (head1 == null) {
-                throw new NullPointerException("Infinity loop here in getSplitPoint");
+        List<String> head1Family = getBranchFamily(head1);
+        List<String> head2Family = getBranchFamily(head2);
+        String splitPoint = head2Family.get(0);
+        for (int i = 1; i < head1Family.size(); i++) {
+            if ((i + 1) > head2Family.size()) {
+                return splitPoint;
             }
-            Commit thisCommit = getCommit(head1);
-            head1 = thisCommit.getParent();
+            if (!head1Family.get(i).equals(head2Family.get(i))) {
+                return splitPoint;
+            }
+            splitPoint = head1Family.get(i);
         }
-        return head1;
+        return splitPoint;
     }
     private static boolean stageAreaIsClear() {
         List<String> stageAddFolder = plainFilenamesIn(stageAdd);
