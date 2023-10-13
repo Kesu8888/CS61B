@@ -349,7 +349,6 @@ public class Repository implements Serializable {
             }
         }
 
-        rmBranch((givenBranch));
         TreeMap<String, String> trackFiles = committing();
         String commitMSG = "Merged "+ givenBranch + " into " + record.getCurrentBranchName() + ".";
         Commit newCommit = new Commit(commitMSG, currentBranchHead +
