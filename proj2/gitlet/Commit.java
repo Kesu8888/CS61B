@@ -17,6 +17,7 @@ public class Commit implements Serializable {
     private String myID;
     private TreeMap<String, String> trackedFiles;
     private String log;
+    private String mergeLog;
 
     public Commit(String message, String parent, TreeMap<String, String> trackedFiles) {
         this.parent = parent;
@@ -24,7 +25,6 @@ public class Commit implements Serializable {
         this.timestamp = Date.getDateNow();
         this.myID = Utils.sha1(toString());
         this.trackedFiles = trackedFiles;
-        log = writeLog();
     }
     public Commit(String message, String parent, String timestamp) {
         this.parent = parent;
@@ -34,14 +34,10 @@ public class Commit implements Serializable {
         trackedFiles = new TreeMap<>();
         trackedFiles.put(this.myID, null);
         trackedFiles.remove(this.myID);
-        log = writeLog();
     }
 
     public void mergeLog(String mergeLog) {
-        String commitID = "===\n" + "commit " + myID + " \n";
-        String Date = "Date: " + timestamp + "\n";
-        String msg = message +"\n";
-        log = commitID + mergeLog + Date + msg;
+        this.mergeLog = mergeLog;
     }
 
     public String getMyID() {
@@ -49,7 +45,20 @@ public class Commit implements Serializable {
     }
 
     public String getLog() {
-        return log;
+        String commitID = "===" + "\n" + "commit " + myID + " \n";
+        String Date = "Date: " + timestamp + "\n";
+        String msg = message +"\n";
+        try {
+            if (parent.length() > 40) {
+                String mergeLog = "Merge: " + parent.substring(0, 7) + " " +
+                    parent.substring(40, 47) + " \n";
+                return commitID + mergeLog + Date + msg + "\n";
+            }
+        }
+        catch(NullPointerException e) {
+            return commitID + Date + msg + "\n";
+        }
+        return commitID + Date + msg + "\n";
     }
     public String getMsg() {
         return this.message;
@@ -68,14 +77,5 @@ public class Commit implements Serializable {
             return null;
         }
         return this.parent.substring(0, 40);
-    }
-
-
-    //Helper methods
-    private String writeLog() {
-        String commitID = "===" + "\n" + "commit " + myID + " \n";
-        String Date = "Date: " + timestamp + "\n";
-        String msg = message +"\n";
-        return commitID + Date + msg;
     }
 }

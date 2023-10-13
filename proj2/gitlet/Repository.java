@@ -115,11 +115,12 @@ public class Repository implements Serializable {
         if (!join(commitFolder, UID).exists()) {
             return;
         }
-        System.out.println(getHeadCommit().getLog());
+        String log = getHeadCommit().getLog();
         for (Commit loop = getHeadCommit(); loop.getParent() != null;) {
             loop = getCommit(loop.getParent());
-            System.out.println(loop.getLog());
+            log = log + loop.getLog();
         }
+        System.out.println(log);
     }
 
     public static void global_Log() {
@@ -306,7 +307,7 @@ public class Repository implements Serializable {
                     if (splitPointFiles.containsKey(k)) {
                         // variant3: splitpoint key same as current key
                         if (v.equals(splitPointFiles.get(k))) {
-                            mergeAdd(k, join(trackFolder, givenHeadFiles.get(k)));
+                            mergeAdd(k, v);
                         } else if (givenHeadFiles.get(k).equals(splitPointFiles.get(k))) {
                             // variant4: splitpoint key same as given key;
                         } else {
@@ -344,17 +345,15 @@ public class Repository implements Serializable {
                     conflictAdd(entry, null);
                 }
             } else {
-                mergeAdd(k, join(trackFolder, v));
+                mergeAdd(k, v);
             }
         }
 
         rmBranch((givenBranch));
         TreeMap<String, String> trackFiles = committing();
-        String commitMSG = "Merge: " + currentBranchHead.substring(0, 6) + " " +
-            givenBranchHead.substring(0, 6) + " \n";
+        String commitMSG = "Merged "+ givenBranch + " into " + record.getCurrentBranchName() + ".";
         Commit newCommit = new Commit(commitMSG, currentBranchHead +
             givenBranchHead, trackFiles);
-        newCommit.mergeLog("Merged "+ givenBranch + " into " + record.getCurrentBranchName() + ".");
         writeCommit(newCommit);
     }
 
@@ -477,16 +476,15 @@ public class Repository implements Serializable {
         String mergeContent = "<<<<<<< HEAD" + "\n" +file1Content + "\n" + "=======" + "\n";
         return mergeContent + file2Content + "\n" + ">>>>>>>" + "\n";
     }
-    private static void mergeAdd(String fileName, File source) {
-        File stageAddDir = join(stageAdd, fileName);
-        File CWDDir = join(CWD, fileName);
-        writeContents(stageAddDir, readContents(source));
-        writeContents(CWDDir, readContents(source));
+    private static void mergeAdd(String fileName, String source) {
+        byte[] sourceContent = readContents(join(trackFolder, source));
+        writeContents(join(stageAdd, fileName), sourceContent);
+        writeContents(join(CWD, fileName), sourceContent);
     }
     private static void mergeDel(String fileName, String sourceFile) {
-        File destination = join(stageDel, fileName);
-        File source = join(trackFolder, sourceFile);
-        writeContents(destination, readContents(source));
+        join(CWD, fileName).delete();
+        byte[] sourceContent = readContents(join(trackFolder, sourceFile));
+        writeContents(join(stageDel, fileName), sourceContent);
     }
     private static void conflictAdd(Map.Entry<String, String> entry, String v2) {
         File conflict = join(CWD, entry.getKey());
