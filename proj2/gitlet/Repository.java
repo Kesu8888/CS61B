@@ -297,6 +297,7 @@ public class Repository implements Serializable {
             }
         }
 
+        String conflictMSG = "";
         for (Map.Entry<String, String> entry : currentHeadFiles.entrySet()) {
             String k = entry.getKey();
             String v = entry.getValue();
@@ -489,6 +490,7 @@ public class Repository implements Serializable {
         File conflict = join(CWD, entry.getKey());
         writeContents(conflict, conflictContent(entry.getValue(), v2));
         writeContents(join(stageAdd, entry.getKey()), readContents(conflict));
+        System.out.println("Encountered a merge conflict.");
     }
 
     private static TreeMap<String, String> committing() {
