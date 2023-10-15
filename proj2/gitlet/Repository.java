@@ -473,8 +473,8 @@ public class Repository implements Serializable {
             file2Content = readContentsAsString(mergeFile2);
         }
         String mergeContent = "<<<<<<< HEAD" + "\n" +file1Content +
-            System.lineSeparator() + "=======" + "\n";
-        return mergeContent + file2Content + ">>>>>>>";
+             "=======" + "\n";
+        return mergeContent + file2Content + ">>>>>>>\n";
     }
     private static void mergeAdd(String fileName, String source) {
         byte[] sourceContent = readContents(join(trackFolder, source));
