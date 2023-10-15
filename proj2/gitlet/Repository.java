@@ -297,7 +297,6 @@ public class Repository implements Serializable {
             }
         }
 
-        String conflictMSG = "";
         for (Map.Entry<String, String> entry : currentHeadFiles.entrySet()) {
             String k = entry.getKey();
             String v = entry.getValue();
@@ -473,8 +472,9 @@ public class Repository implements Serializable {
             File mergeFile2 = join(trackFolder, file2);
             file2Content = readContentsAsString(mergeFile2);
         }
-        String mergeContent = "<<<<<<< HEAD" + "\n" +file1Content + "\n" + "=======" + "\n";
-        return mergeContent + file2Content + "\n" + ">>>>>>>" + "\n";
+        String mergeContent = "<<<<<<< HEAD" + "\n" +file1Content +
+            System.lineSeparator() + "=======" + "\n";
+        return mergeContent + file2Content + ">>>>>>>" + "\n";
     }
     private static void mergeAdd(String fileName, String source) {
         byte[] sourceContent = readContents(join(trackFolder, source));
