@@ -1,10 +1,5 @@
 package gitlet;
-
-// TODO: any imports you need here
-import com.sun.source.tree.Tree;
-
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.TreeMap;
 /*  @author FU KAIQI
  */
@@ -26,6 +21,7 @@ public class Commit implements Serializable {
         this.myID = Utils.sha1(toString());
         this.trackedFiles = trackedFiles;
     }
+
     public Commit(String message, String parent, String timestamp) {
         this.parent = parent;
         this.message = message;
@@ -47,19 +43,19 @@ public class Commit implements Serializable {
     public String getLog() {
         String commitID = "===" + "\n" + "commit " + myID + " \n";
         String Date = "Date: " + timestamp + "\n";
-        String msg = message +"\n";
+        String msg = message + "\n";
         try {
             if (parent.length() > 40) {
                 String mergeLog = "Merge: " + parent.substring(0, 7) + " " +
                     parent.substring(40, 47) + " \n";
                 return commitID + mergeLog + Date + msg + "\n";
             }
-        }
-        catch(NullPointerException e) {
+        } catch (NullPointerException e) {
             return commitID + Date + msg + "\n";
         }
         return commitID + Date + msg + "\n";
     }
+
     public String getMsg() {
         return this.message;
     }
@@ -77,5 +73,15 @@ public class Commit implements Serializable {
             return null;
         }
         return this.parent.substring(0, 40);
+    }
+
+    public String getParent2() {
+        if (parent == null) {
+            return null;
+        }
+        if (parent.length() > 40) {
+            return parent.substring(40, 80);
+        }
+        return null;
     }
 }

@@ -3,8 +3,6 @@ package gitlet;
 import java.io.File;
 import java.io.Serializable;
 import java.util.*;
-import java.util.LinkedList;
-
 import static gitlet.Utils.*;
 
 
@@ -432,31 +430,45 @@ public class Repository implements Serializable {
         deleteFolder(stageAdd);
         deleteFolder(stageDel);
     }
-    private static LinkedList<String> getBranchFamily(String headCommitID) {
-        LinkedList<String> branchFamily = new LinkedList<>();
-        branchFamily.add(headCommitID);
-        for (Commit head = getCommit(headCommitID); head.getParent() != null;) {
-            head = readObject(join(commitFolder, head.getParent()), Commit.class);
-            branchFamily.addFirst(head.getMyID());
+    private static Graph getBranchFamily(String commitID, Graph g) {
+        if (g.contains(commitID)) {
+            return g;
         }
-        return branchFamily;
+        Commit commit = getCommit(commitID);
+        g.addPoint(commitID, commit.getParent(), commit.getParent2());
+        if (commit.getParent() != null) {
+            g = getBranchFamily(commit.getParent(), g);
+        }
+        if (commit.getParent2() != null) {
+            g = getBranchFamily(commit.getParent2(), g);
+        }
+        return g;
     }
 
     private static String getSplitPoint(String head1, String head2) {
-        LinkedList<String> head1Family = getBranchFamily(head1);
-        LinkedList<String> head2Family = getBranchFamily(head2);
-        String splitPoint = head2Family.get(0);
-        for (int i = 1; i < head1Family.size(); i++) {
-            if ((i + 1) > head2Family.size()) {
-                return splitPoint;
+        Commit head1C = getCommit(head1);
+        Commit head2C = getCommit(head2);
+        Graph head1Family = getBranchFamily(head1,
+            new Graph());
+        Graph head2Family = getBranchFamily(head2,
+            new Graph());
+        String splitPoint = UID;
+        int distance = head1Family.distanceTo(UID) + head2Family.distanceTo(UID);
+        for (String commitID : head1Family.keySet()) {
+            if (commitID.equals(splitPoint)) {
+                continue;
             }
-            if (!head1Family.get(i).equals(head2Family.get(i))) {
-                return splitPoint;
+            if (head2Family.contains(commitID)) {
+                int combinedDistance = head1Family.distanceTo(commitID) + head2Family.distanceTo(commitID);
+                if (combinedDistance < distance) {
+                    splitPoint = commitID;
+                    distance = combinedDistance;
+                }
             }
-            splitPoint = head1Family.get(i);
         }
         return splitPoint;
     }
+
     private static boolean stageAreaIsClear() {
         List<String> stageAddFolder = plainFilenamesIn(stageAdd);
         List<String> stageDelFolder = plainFilenamesIn(stageDel);
