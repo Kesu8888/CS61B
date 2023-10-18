@@ -24,18 +24,18 @@ public class Repository implements Serializable {
      */
 
     /** The Main directory. */
-    public static final File CWD = new File(System.getProperty("user.dir"));
+    protected static final File CWD = new File(System.getProperty("user.dir"));
     /** The .gitlet directory. */
-    public static final File GITLET_DIR = join(CWD, ".gitlet");
+    protected static final File GITLET_DIR = join(CWD, ".gitlet");
     /** Shared UID of initial Commit */
-    public static String UID = "8302022aba41d8b3d27a6d73c33a284d948cd2a8";
+    protected static String UID = "8302022aba41d8b3d27a6d73c33a284d948cd2a8";
     /** Create a stage for add and for remove folder */
-    public static final File stageAdd = join(GITLET_DIR, "stageAdd");
-    public static final File stageDel = join(GITLET_DIR, "stageDelete");
+    protected static final File stageAdd = join(GITLET_DIR, "stageAdd");
+    protected static final File stageDel = join(GITLET_DIR, "stageDelete");
     /** Create a tracked file folder */
-    public static final File commitFolder = join(GITLET_DIR, "commitFolder");
-    public static final File trackFolder = join(GITLET_DIR, "trackFolder");
-    public static final File recording = join(GITLET_DIR, "recording");
+    protected static final File commitFolder = join(GITLET_DIR, "commitFolder");
+    protected static final File trackFolder = join(GITLET_DIR, "trackFolder");
+    protected static final File recording = join(GITLET_DIR, "recording");
 
     // Create a Initial Commit and create a master branch
     public static void init() {
@@ -271,9 +271,10 @@ public class Repository implements Serializable {
         String splitPoint = getSplitPoint(currentBranchHead, givenBranchHead);
         if (splitPoint.equals(currentBranchHead)) {
             checkoutBranch(givenBranch);
+            System.out.println("Current branch fast-forwarded.");
             return;
         }
-        if (splitPoint.equals(givenBranch)) {
+        if (getBranchFamily(currentBranchHead, new Graph()).contains(givenBranchHead)) {
             System.out.println("Given branch is an ancestor of the current branch.");
             return;
         }
@@ -377,6 +378,14 @@ public class Repository implements Serializable {
         return Utils.readObject(headCommitFile, Commit.class);
     }
     private static Commit getCommit(String commitID) {
+        if (commitID.length() < 40) {
+            List<String> allCommits = plainFilenamesIn(commitFolder);
+            for (String commit : allCommits) {
+                if (commit.substring(0, commitID.length()).equals(commitID)) {
+                    commitID = commit;
+                }
+            }
+        }
         File commitFile = join(commitFolder, commitID);
         if (!commitFile.exists()) {
             System.out.println("No commit with that id exists.");
