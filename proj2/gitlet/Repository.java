@@ -306,7 +306,7 @@ public class Repository implements Serializable {
                     if (splitPointFiles.containsKey(k)) {
                         // variant3: splitpoint key same as current key
                         if (v.equals(splitPointFiles.get(k))) {
-                            mergeAdd(k, v);
+                            mergeAdd(k, givenHeadFiles.get(k));
                         } else if (givenHeadFiles.get(k).equals(splitPointFiles.get(k))) {
                             // variant4: splitpoint key same as given key;
                         } else {
