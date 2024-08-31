@@ -2,9 +2,8 @@ package gitlet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.function.Consumer;
 
-public class Graph {
+public class Graph implements Iterable<String>{
     private HashMap<String, ListNode> graph;
     private String vertex;
     private HashMap<String, Integer> map;
@@ -16,6 +15,28 @@ public class Graph {
     public Set<String> keySet() {
         return graph.keySet();
     }
+
+    @Override
+    public Iterator<String> iterator() {
+        return new Iterator<>() {
+            Set<String> set = keySet();
+            String[] keyArray = set.toArray(new String[0]);
+            int i = 0;
+            @Override
+            public boolean hasNext() {
+                return i < keyArray.length;
+            }
+
+            @Override
+            public String next() {
+                String returnValue = keyArray[i];
+                i = i + 1;
+                return returnValue;
+
+            }
+        };
+    }
+
     public class ListNode {
         private String p1;
         private String p2;
@@ -43,6 +64,10 @@ public class Graph {
             createMap(vertex, 0);
         }
         return map.get(destination);
+    }
+
+    public String getVertex() {
+        return vertex;
     }
 
     private void createMap(String point, Integer distance) {

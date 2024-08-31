@@ -109,6 +109,7 @@ public class Repository implements Serializable {
             System.out.println("No reason to remove the file.");
         }
     }
+
     public static void log() {
         if (!join(commitFolder, UID).exists()) {
             return;
@@ -243,16 +244,19 @@ public class Repository implements Serializable {
             System.out.println("File does not exist in that commit.");
         }
     }
+
     public static void branch(String branchName) {
         RecordList record = readObject(recording, RecordList.class);
         record.createNewBranch(branchName);
         writeRecord(record);
     }
+
     public static void rmBranch(String branchName) {
         RecordList record = readObject(recording, RecordList.class);
         record.removeBranch(branchName);
         writeRecord(record);
     }
+
     public static void reset(String commitID) {
         checkoutCommit(commitID);
         RecordList record = readObject(recording, RecordList.class);
@@ -355,13 +359,20 @@ public class Repository implements Serializable {
         writeCommit(newCommit);
     }
 
+    public static void initializeCheck() {
+        File IC = join(commitFolder, UID);
+        if (!IC.exists()) {
+            System.out.println("Not in an initialized Gitlet directory.");
+            System.exit(0);
+        }
+    }
 
 
     ///////////////////////
     ///////////////////////
     ///////////////////////
     //Private helper method
-    private static void writeCommit(Commit commit) {
+    protected static void writeCommit(Commit commit) {
         File writeCommit = join(commitFolder, commit.getMyID());
         Utils.writeObject(writeCommit, commit);
 
@@ -369,10 +380,10 @@ public class Repository implements Serializable {
         record.updateHeadCommit(commit.getMyID());
         writeRecord(record);
     }
-    private static void writeRecord(RecordList record) {
+    protected static void writeRecord(RecordList record) {
         Utils.writeObject(recording, record);
     }
-    private static Commit getHeadCommit() {
+    protected static Commit getHeadCommit() {
         RecordList record = Utils.readObject(recording, RecordList.class);
         File headCommitFile = join(commitFolder, record.getHeadCommit());
         return Utils.readObject(headCommitFile, Commit.class);
@@ -439,7 +450,7 @@ public class Repository implements Serializable {
         deleteFolder(stageAdd);
         deleteFolder(stageDel);
     }
-    private static Graph getBranchFamily(String commitID, Graph g) {
+    protected static Graph getBranchFamily(String commitID, Graph g) {
         if (g.contains(commitID)) {
             return g;
         }
@@ -564,12 +575,5 @@ public class Repository implements Serializable {
             s = s + S;
         }
         return s;
-    }
-    public static void initializeCheck() {
-        File IC = join(commitFolder, UID);
-        if (!IC.exists()) {
-            System.out.println("Not in an initialized Gitlet directory.");
-            System.exit(0);
-        }
     }
 }

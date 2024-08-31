@@ -2,51 +2,163 @@ package byow.Core;
 
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
+import edu.princeton.cs.introcs.StdDraw;
+
+import java.io.File;
+import static byow.Core.Utils.*;
 
 public class Engine {
     TERenderer ter = new TERenderer();
     /* Feel free to change the width and height. */
     public static final int WIDTH = 80;
-    public static final int HEIGHT = 30;
-
-    /**
-     * Method used for exploring a fresh world. This method should handle all inputs,
-     * including inputs from the main menu.
-     */
+    public static final int HEIGHT = 50;
+    public static World world;
+    public static TETile[][] Tile;
+    public static File worldsStore = join(System.getProperty("user.dir"), "wordsStore");
+    public static String Seed;
+    public Engine() {
+        if (!worldsStore.exists()) {
+            worldsStore.mkdirs();
+        }
+    }
     public void interactWithKeyboard() {
+        TERenderer ter = new TERenderer();
+        ter.initialize(WIDTH, HEIGHT);
+        TETile[][] Interface = UI.Starter(WIDTH, HEIGHT);
+        ter.renderFrame(Interface);
+        while (true) {
+            StringBuilder sb = new StringBuilder();
+            //Make sure the user has keyed in something
+            if (StdDraw.hasNextKeyTyped()) {
+                Seed = sb.append(StdDraw.nextKeyTyped()).toString();
+                instruction("-k");
+            }
+        }
     }
 
-    /**
-     * Method used for autograding and testing your code. The input string will be a series
-     * of characters (for example, "n123sswwdasdassadwas", "n123sss:q", "lwww". The engine should
-     * behave exactly as if the user typed these characters into the engine using
-     * interactWithKeyboard.
-     *
-     * Recall that strings ending in ":q" should cause the game to quite save. For example,
-     * if we do interactWithInputString("n123sss:q"), we expect the game to run the first
-     * 7 commands (n123sss) and then quit and save. If we then do
-     * interactWithInputString("l"), we should be back in the exact same state.
-     *
-     * In other words, both of these calls:
-     *   - interactWithInputString("n123sss:q")
-     *   - interactWithInputString("lww")
-     *
-     * should yield the exact same world state as:
-     *   - interactWithInputString("n123sssww")
-     *
-     * @param input the input string to feed to your program
-     * @return the 2D TETile[][] representing the state of the world
-     */
-    public TETile[][] interactWithInputString(String input) {
-        // TODO: Fill out this method so that it run the engine using the input
-        // passed in as an argument, and return a 2D tile representation of the
-        // world that would have been drawn if the same inputs had been given
-        // to interactWithKeyboard().
-        //
-        // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
-        // that works for many different input types.
+    public void interactWithInputString(String input) {
+        TERenderer ter = new TERenderer();
+        ter.initialize(WIDTH, HEIGHT);
+        TETile[][] Interface = UI.Starter(WIDTH, HEIGHT);
+        ter.renderFrame(Interface);
+        Seed = input;
+        while (Seed.length() > 0) {
+            try {
+                Thread.sleep(1500);
+            } catch (InterruptedException IE) {
+                //
+            }
+            instruction("-s");
+        }
+    }
 
-        TETile[][] finalWorldFrame = null;
-        return finalWorldFrame;
+    public void instruction(String mode) {
+        if (world == null) {
+            switch (Character.toLowerCase(Seed.charAt(0))) {
+                case 'n':
+                    Seed = Seed.substring(1);
+                    String seedStr = "";
+                    if (mode.equals("-s")) {
+                        seedStr = getSeedWithString();
+                    } else {
+                        seedStr = getSeedWithKeyboard();
+                    }
+                    try {
+                        world = worldCreation(Integer.parseInt(seedStr));
+                    } catch (NumberFormatException nf) {
+                        System.out.println("the seed is not a correct number");
+                    }
+                    Tile = world.Tile();
+                    ter.renderFrame(Tile);
+                    return;
+                case 'l':
+                    File loading = join(worldsStore, "loading");
+                    if (loading.exists()) {
+                        world = readObject(loading, World.class);
+                    }
+                    break;
+                case 'q':
+                    break;
+            }
+        } else {
+            switch (Character.toLowerCase(Seed.charAt(0))) {
+                case 'w':
+                    Tile = world.move('w');
+                    break;
+                case 'a':
+                    Tile = world.move('a');
+                    break;
+                case 's':
+                    Tile = world.move('s');
+                    break;
+                case 'd':
+                    Tile = world.move('d');
+                    break;
+                case ':':
+                    Seed = Seed.substring(1);
+                    if (mode.equals("-s")) {
+
+                    } else {
+
+                    }
+                    break;
+            }
+            if (Tile == null) {
+                reward(ter);
+                gameClear();
+            }
+            ter.renderFrame(Tile);
+        }
+    }
+
+    private String getSeedWithString() {
+        StringBuilder sb = new StringBuilder();
+        while (Character.isDigit(Seed.charAt(0)) && Seed.length() > 0) {
+            sb.append(Seed.charAt(0));
+            Seed = Seed.substring(1);
+        }
+        return sb.toString();
+    }
+
+    private String getSeedWithKeyboard() {
+        boolean isDigit = true;
+        StringBuilder sb = new StringBuilder();
+        ter.renderFrame(UI.seedEnteringUI(WIDTH, HEIGHT, sb.toString()));
+        while (isDigit) {
+            if(StdDraw.hasNextKeyTyped()) {
+                char c = StdDraw.nextKeyTyped();
+                if (Character.isDigit(c)) {
+                    sb.append(c);
+                    ter.renderFrame(UI.seedEnteringUI(WIDTH, HEIGHT, sb.toString()));
+                } else {
+                    isDigit = false;
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+    private static World worldCreation(int seed) {
+        World newWorld = new World(seed, WIDTH, HEIGHT);
+        newWorld.construct();
+        return newWorld;
+    }
+
+    private static void reward(TERenderer ter) {
+        ter.renderFrame(UI.VoidArea(WIDTH, HEIGHT));
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException IE) {
+            //
+        }
+    }
+
+    private static void worldNotExist(char S) {
+    }
+    private static void gameClear() {
+        File loading = join(worldsStore, "loading");
+        loading.delete();
+        world = null;
+        Tile = null;
     }
 }

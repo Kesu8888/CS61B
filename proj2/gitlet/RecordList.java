@@ -19,6 +19,13 @@ public class RecordList implements Serializable {
         }
         recordFile.put(branchName, recordFile.get(currentBranch));
     }
+    public void createNewBranch(String branchName, String headCommit) {
+        if (branchExist(branchName)) {
+            System.out.println("A branch with that name already exists.");
+            return;
+        }
+        recordFile.put(branchName, headCommit);
+    }
 
     public void removeBranch(String branchName) {
         if (!branchExist(branchName)) {
@@ -38,6 +45,9 @@ public class RecordList implements Serializable {
 
     public void updateHeadCommit(String commitID) {
         recordFile.put(currentBranch, commitID);
+    }
+    public void updateHeadCommit(String branchName, String commitID) {
+        recordFile.put(branchName, commitID);
     }
 
     public boolean branchExist(String branchName) {
